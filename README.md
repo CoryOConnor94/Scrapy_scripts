@@ -159,6 +159,109 @@ Title,Author,Length
 - Modify the `start_requests` method to scrape a different Audible page.
 - Update the XPath selectors if Audible changes its website structure.
 
+---------
+
+## Transcript Crawler
+
+This is a Scrapy `CrawlSpider` designed to scrape movie and TV show transcript data from `subslikescript.com`. The spider extracts titles, plots, and URLs, following pagination to retrieve multiple pages.
+
+## Project Structure
+
+```
+transcript_scraper/
+│── scrapy.cfg
+│── transcript_scraper/
+│   ├── __init__.py
+│   ├── items.py
+│   ├── middlewares.py
+│   ├── pipelines.py
+│   ├── settings.py
+│   └── spiders/
+│       ├── __init__.py
+│       ├── transcript_crawl_spider.py
+│── .gitignore
+│── README.md
+```
+
+## Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/transcript_scraper.git
+   cd transcript_scraper
+   ```
+
+2. **Create and activate a virtual environment:**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # macOS/Linux
+   venv\Scripts\activate     # Windows
+   ```
+
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## How It Works
+
+### **Spider: `transcript_crawl_spider`**
+
+- **Start URL:** `https://subslikescript.com`
+- **Extracts transcript information:**
+  - Title
+  - Plot
+  - URL
+- **Handles pagination:**
+  - Follows the "Next" button to scrape additional pages.
+- **Implements a download delay** of `0.8s` to prevent overloading the server.
+
+## Database Integration
+
+This project supports storing scraped data in either MongoDB or SQLite.
+
+### **MongoDB Pipeline**
+
+- Stores scraped data in a MongoDB database.
+- Requires a valid MongoDB connection string.
+- Data is stored in the `transcripts` collection within a specified database.
+
+### **SQLite Pipeline**
+
+- The pipeline automatically creates and stores data in `transcripts.db`.
+- Uses an SQLite table `transcripts` with columns:
+  - `title` (TEXT)
+  - `plot` (TEXT)
+  - `url` (TEXT)
+
+To enable the desired database, configure `ITEM_PIPELINES` in `settings.py`:
+```python
+ITEM_PIPELINES = {
+   "spider_tutorial.pipelines.MongoDBPipeline": 300,  # Enable MongoDB
+   "spider_tutorial.pipelines.SQLitePipeline": 300    # Enable SQLite
+}
+```
+
+## Running the Scraper
+
+To run the spider and store output in a CSV file:
+```bash
+scrapy crawl transcript_crawl_spider -o transcripts.csv
+```
+
+## Output Example (CSV Format)
+
+```
+Title,Plot,Url
+"Inception","A thief with the ability to enter people's dreams and steal secrets...","https://subslikescript.com/movie/Inception"
+"The Dark Knight","Batman battles the Joker, who seeks to create chaos in Gotham City...","https://subslikescript.com/movie/The_Dark_Knight"
+```
+
+## Customizing the Spider
+
+- Modify the `start_urls` variable to target a different transcript category.
+- Update XPath selectors if `subslikescript.com` changes its website structure.
+
 ## License
 
 This project is licensed under the MIT License.
@@ -166,4 +269,5 @@ This project is licensed under the MIT License.
 ---
 
 Feel free to contribute or report issues!
+
 
